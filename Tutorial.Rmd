@@ -196,7 +196,7 @@ def eur_demog(params, ns, pts):
 	return fs
 ```
 
-Ok, now that we have a function that exemplifies the specific demographic model we wanna test our data against, we can now input the synonymous site frequency spectrum (as our data) and use it to estimate our demographic parameters. So to say we are trying to maximize our likelihood given the data.
+Ok, now that we have a function that exemplifies the specific demographic model we wanna test our data against, we can now input the synonymous site frequency spectrum (as our data) and use it to estimate our demographic parameters. So to say we are trying to maximize a likelihood function given the data.
 
 Keep adding into your dadi_fitdadi.py script
 ```{python, eval=F, python.reticulate=F}

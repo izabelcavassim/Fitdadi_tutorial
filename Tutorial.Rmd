@@ -201,7 +201,7 @@ def eur_demog(params, ns, pts):
 	return fs
 ```
 
-More about the model specification can be found [here](https://dadi.readthedocs.io/en/latest/user-guide/specifying-a-model/).
+More about the demographic model specification can be found [here](https://dadi.readthedocs.io/en/latest/user-guide/specifying-a-model/).
 
 Ok, now that we have a function that exemplifies the specific demographic model we wanna test our data against, we can now input the synonymous site frequency spectrum (as our data) and use it to estimate our demographic parameters. So to say we are trying to maximize a likelihood function given the data.
 
@@ -243,6 +243,14 @@ print("This is a initial random point")
 print(p0)
 
 ```
+
+It is never a good idea to just run stuff on the terminal on the cluster (since that can slow down the cluster). Instead what we can do is to request a node of the cluster for ourselves to play around. To do so you need to type the following:
+
+```{bash, eval = F}
+qrsh -l h_data=8G,h_rt=4:00:00
+```
+This will give us access to a node to play with for 4 hours, once you are there you can now run your python script!
+
 What values do you get? Note that we are just choosing at random a starting point for the optimization. In order for us to actually optimize we need to give boundaries and a initial point (our p0). 
 
 continue adding the following chunk of code to your script:

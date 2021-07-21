@@ -187,7 +187,7 @@ def eur_demog(params, ns, pts):
 	dadi.Integration.timescale_factor = 0.001 # scaling factor to speed the computation
 	xx = dadi.Numerics.default_grid(pts) # number of points to be used during the integration
 	
-	phi = dadi.PhiManip.phi_1D(xx) # phi for the equilibrium ancestral population size
+	phi = dadi.PhiManip.phi_1D(xx) # phi for the equilibrium ancestral population size, phi is the density of mutations within the populations at given frequencies. 
 	phi = dadi.Integration.one_pop(phi, xx, T1, N1) 
 	phi = dadi.Integration.one_pop(phi, xx, T2, N2) # phi for the recovery event (population growth)
 	
@@ -200,6 +200,8 @@ def eur_demog(params, ns, pts):
 	fs = dadi.Spectrum.from_phi(phi, ns, (xx,))
 	return fs
 ```
+
+More about the model specification can be found [here](https://dadi.readthedocs.io/en/latest/user-guide/specifying-a-model/).
 
 Ok, now that we have a function that exemplifies the specific demographic model we wanna test our data against, we can now input the synonymous site frequency spectrum (as our data) and use it to estimate our demographic parameters. So to say we are trying to maximize a likelihood function given the data.
 

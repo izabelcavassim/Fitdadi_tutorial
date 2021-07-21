@@ -359,7 +359,8 @@ pre code {
 <li><a href="https://dadi.readthedocs.io/en/latest/user-guide/dfe-inference/">dfe inference</a></li>
 <li><a href="https://dadi.readthedocs.io/en/latest/examples/YRI_CEU/YRI_CEU/">demographic inference</a></li>
 <li><a href="https://dadi.readthedocs.io/en/latest/">dadi website</a></li>
-<li><a href>conda website</a></li>
+<li><a href="https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html">conda website</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Maximum_likelihood_estimation">maximum likelihood analyses</a></li>
 </ul>
 <div id="accessing-the-cluster" class="section level2">
 <h2>Accessing the cluster</h2>
@@ -385,15 +386,15 @@ rm -rf ~/miniconda3/miniconda.sh</code></pre>
 <pre class="bash"><code>conda activate summer_project</code></pre>
 <p>if you have successfully installed and activated this environment you will see at the left most side of the screen the name of the project followed by your username.</p>
 <p>Perfect! Now we can install <strong>inside of this environment</strong> all the other packages we will be using to run fitdadi.</p>
-<p>We start installing by dadi. If we look at the website for the dadi software <a href="https://dadi.readthedocs.io/en/latest/user-guide/installation/">here</a>, they recommend that we use the following:</p>
+<p>We start it by installing dadi. If we look at the website for the dadi software <a href="https://dadi.readthedocs.io/en/latest/user-guide/installation/">here</a>, they recommend that we use the following code:</p>
 <pre class="bash"><code>conda install -c conda-forge dadi</code></pre>
-<p>It requires installing multiple packages, you just need to type ‘y’ to proceed with the installation. To check whether dadi was sucessully installed we can just call the software on terminal:</p>
+<p>It requires that we install multiple packages (dependencies), you just need to type ‘y’ and enter to proceed with the installation. To check whether dadi was successfully installed, we can just call the software on terminal. Since it is a python module, than you should first call python:</p>
 <pre class="bash"><code>python
 import dadi</code></pre>
-<p>if it does not complain, then you have succeed on its instalation.</p>
-<p>As you may know dadi is going to be useful in our analyses to estimate specific demographic parameters. The idea here is that it’s important to separate real demographic events from selection events. It is important to have in mind that demographic events will affect the genome differently than selection, while bottlenecks (population contraction) and population expansions are expected to affect neutral diversity and coding sequences <strong>equally</strong>, purifying selection should mainly affect the coding regions. Hence we are going to conduct demographic inference from neutral regions far from genes (synonymous SFS) to correct for demography+linked selection, and the non-synonymous SFS to look for purifying selection.</p>
-<p>The demographic part we conduct with dadi, the selection part we condudct with fitdadi. They both are python modules, that we will need to import when writing our python scripts.</p>
-<p>So lets install fitdadi. The easiest way to do so is by just downloading the ‘Selection.py’ script from github. But lets first create a folder that will contain all our scripts: as:</p>
+<p>If it does not complain, then you have succeed on its instalation.</p>
+<p>As you may know dadi is going to be useful in our analyses for estimating specific demographic parameters. The idea here is that it’s important to separate real demographic events from selection events. It is important to have in mind that demographic events will affect the genome differently than selection, while bottlenecks (population contraction) and population expansions are expected to affect neutral diversity and coding sequences <strong>equally</strong>, purifying selection should mainly affect the coding regions. Hence, we are going to conduct demographic inference from neutral regions far from genes (synonymous SFS) to correct for demography+linked selection, and the non-synonymous SFS to look for purifying selection.</p>
+<p>The demographic part we conduct with dadi, the selection part we condudct with fitdadi. They are both python modules, that we will need to import when writing our python scripts.</p>
+<p>So let’s install fitdadi. The easiest way to do it so is by downloading the ‘Selection.py’ script from its github repository. But lets first create a folder that will contain all our scripts: as:</p>
 <pre class="bash"><code>mkdir scripts_summer_course
 cd scripts_summer_course
 wget https://raw.githubusercontent.com/LohmuellerLab/fitdadi/master/Selection.py</code></pre>
@@ -401,7 +402,7 @@ wget https://raw.githubusercontent.com/LohmuellerLab/fitdadi/master/Selection.py
 <pre class="bash"><code>python
 import dadi
 import Selection</code></pre>
-<p>You will see that we will get some errors because the Selection.py has its annotation in python2 and our environment is installed with python3. To fix this we will edit the Selection.py script manually, and for every ‘print statement’ we will include parenthesis as:</p>
+<p>You will see that we will get some errors because the Selection.py script has its annotation in python2 and our environment is installed with python3. To fix this, we will edit the Selection.py script manually, and for every ‘print statement’ we will include parenthesis as:</p>
 <pre class="bash"><code>from:
 print &#39;{0}: {1}&#39;.format(ii, gamma)
 
@@ -411,6 +412,8 @@ print(&#39;{0}: {1}&#39;).format(ii, gamma)</code></pre>
 <p>to edit I will be using emacs:</p>
 <pre class="bash"><code>emacs Selection.py</code></pre>
 <p>Edit lines 80 and 96 as shown above. Try to import the module again through python. Type ctrl X ctrl S to have your modifications and then type ctrl z to leave the file.</p>
+<p>To make life easier for you guys, I have also included the Selection.py script <a href="https://github.com/izabelcavassim/Fitdadi_tutorial/blob/master/Selection.py">here</a>. Note that to download the raw script you can press the <em>Raw</em> botton around the up right corner of the screen. Once you save it in your computer you should transfer it to the cluster.</p>
+<p>For mac users it is convenient to use the software <a href="https://cyberduck.io/">Cyberduck</a> for transferring between the cluster and your own machine.</p>
 </div>
 <div id="getting-familiar-with-fitdadi" class="section level2">
 <h2>Getting familiar with Fitdadi</h2>
@@ -447,6 +450,7 @@ def eur_demog(params, ns, pts):
 <p>What do you find?</p>
 <pre class="python"><code>import dadi
 import Selection
+import pickle
 import numpy
 
 def eur_demog(params, ns, pts):
@@ -472,7 +476,7 @@ def eur_demog(params, ns, pts):
     # Finally, calculate the spectrum.
     fs = dadi.Spectrum.from_phi(phi, ns, (xx,))
     return fs</code></pre>
-<p>Ok, now that we have a function that exemplifies the specific demographic model we wanna test our data against we can now input the synonymous site frequency spectrum and use it to estimate our demographic parameters given the data.</p>
+<p>Ok, now that we have a function that exemplifies the specific demographic model we wanna test our data against, we can now input the synonymous site frequency spectrum (as our data) and use it to estimate our demographic parameters. So to say we are trying to maximize a likelihood function given the data.</p>
 <p>Keep adding into your dadi_fitdadi.py script</p>
 <pre class="python"><code>#load 1000 genomes synonymous SFS
 infilename = &quot;1kG_syn.csv&quot;
@@ -527,8 +531,10 @@ print(&quot;This is the demographic model&quot;)
 print(popt)
 
 #best fit should be similar to                                                                          </code></pre>
-<p>Once we have found the optimum demographic parameters, we now can should compute the population scale diversity (theta_s). Because this method only fits the proportional SFS, theta_S is estimated with the dadi.Inference.optimal_sfs_scaling method. Then, we multiply theta_S by 2.31 to get theta_NS, i.e. theta_S∗2.31=theta_NS.<br />
-## Computing synonymous theta</p>
+<p>Once we have found the optimum demographic parameters, we now can should compute the population scale diversity (theta_s). Because this method only fits the proportional SFS, theta_S is estimated with the dadi.Inference.optimal_sfs_scaling method. Then, we multiply theta_S by 2.31 to get theta_NS, i.e. theta_S∗2.31=theta_NS.</p>
+</div>
+<div id="computing-synonymous-theta" class="section level2">
+<h2>Computing synonymous theta</h2>
 <pre class="python"><code>theta_s = dadi.Inference.optimal_sfs_scaling(func_ex(popt, syn_sfs.sample_sizes, pts_l),syn_sfs)
 
 print(&quot;This is theta synonymous&quot;)
@@ -642,6 +648,38 @@ print(popt)</code></pre>
 <p>If this runs correctly, you should infer something close to, but not exactly, the true DFE. The results will be stored in popt. Print your results and see what you get.</p>
 <p>The mean selection coefficient that you guys use in your slim simulations need to be re-scaled as:</p>
 <p>E[s] = -shape * scale * 2/(2Na) = (-0.18 * 905 * 2 )/(2*12378) E[s] = -0.01316045</p>
+<p>The expected SFS at the MLE can be computed with:</p>
+<pre class="python"><code>modelsfs = spectra.integrate( popt[1], Selection.gamma_dist, theta_ns)</code></pre>
+<p>You can plot your SFS in R. You can also take the gamma coefficients (scale and shape) in order to compute the probability mass for a given selection coefficient. We can create a function in R, that will both estimate the proportions in each bin while also plotting it.</p>
+<pre class="r"><code>library(ggplot2)
+
+plot_discrete_DFE &lt;- function(alpha, beta, Nanc){
+  # compute bin masses  
+  x0 = 0. * 2 * Nanc
+  x1 = 1e-5 * 2 * Nanc
+  x2 = 1e-4 * 2 * Nanc
+  x3 = 1e-3 * 2 * Nanc
+  x4 = 1e-2 * 2 * Nanc
+  x5 = 1 * 2 * Nanc
+  a = pgamma(x1,shape=alpha,scale=beta)
+  b = pgamma(x2,shape=alpha,scale=beta) - pgamma(x1,shape=alpha,scale=beta)
+  c = pgamma(x3,shape=alpha,scale=beta) - pgamma(x2,shape=alpha,scale=beta)
+  d = pgamma(x4,shape=alpha,scale=beta) - pgamma(x3,shape=alpha,scale=beta)
+  e = 1 - pgamma(x4,shape=alpha,scale=beta)
+  
+  two_Nanc_s_range = c(&quot;0&lt;= |s| &lt; 10^-5&quot;, &quot;10^-5 &lt;= |s| &lt;= 10^-4&quot;, 
+            &quot;10^-4 &lt;= |s| &lt; 10^-3&quot;, &quot;10^-3 &lt;= |s| &lt;= 10^-2&quot;, &quot;10^-2 &lt;= |s|&quot;)
+  df = as.data.frame(cbind(two_Nanc_s_range, c(a,b,c,d,e)))
+  colnames(df) &lt;- c(&quot;s&quot;, &quot;Probability_mass&quot;)
+  df$Probability_mass = as.numeric(df$Probability_mass)
+  level_order &lt;- two_Nanc_s_range
+  print(sum(a,b,c,d,e))
+  print(df)
+  plot1 &lt;- ggplot(data=df, aes(x=factor(s,two_Nanc_s_range), y=Probability_mass)) + geom_bar(stat=&quot;identity&quot;) + theme_bw() 
+  return(plot1)
+}</code></pre>
+<p>Try some of the values found within the Kim 2017 paper <a href="https://www.genetics.org/content/206/1/345">here</a> to see if it agrees with their results.</p>
+<p>Does it work?</p>
 </div>
 
 

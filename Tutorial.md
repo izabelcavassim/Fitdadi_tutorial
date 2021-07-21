@@ -187,7 +187,7 @@ def eur_demog(params, ns, pts):
 	dadi.Integration.timescale_factor = 0.001 # scaling factor to speed the computation
 	xx = dadi.Numerics.default_grid(pts) # number of points to be used during the integration
 	
-	phi = dadi.PhiManip.phi_1D(xx) # phi for the equilibrium ancestral population size
+	phi = dadi.PhiManip.phi_1D(xx) # phi for the equilibrium ancestral population size, phi is the density of mutations within the populations at given frequencies. 
 	phi = dadi.Integration.one_pop(phi, xx, T1, N1) 
 	phi = dadi.Integration.one_pop(phi, xx, T2, N2) # phi for the recovery event (population growth)
 	
@@ -200,6 +200,8 @@ def eur_demog(params, ns, pts):
 	fs = dadi.Spectrum.from_phi(phi, ns, (xx,))
 	return fs
 ```
+
+More about the model specification can be found [here](https://dadi.readthedocs.io/en/latest/user-guide/specifying-a-model/).
 
 Ok, now that we have a function that exemplifies the specific demographic model we wanna test our data against, we can now input the synonymous site frequency spectrum (as our data) and use it to estimate our demographic parameters. So to say we are trying to maximize a likelihood function given the data.
 
@@ -221,11 +223,11 @@ T2 = (1553.2561-235.47597)/(2*Nanc)
 TC = 235.47597/(2*Nanc)
 
 #setup dadi optimization stuff
-pts_l = [1000, 1400, 1800]
-func = eur_demog
-func_ex = dadi.Numerics.make_extrap_log_func(func)
-params = [N1, T1, N2, T2, NC, TC]
-lower_bound = [1e-2, 0.01, 1e-2, 1e-3, 1, 1e-3]
+pts_l = [1000, 1400, 1800] # the number of grid points used in the calculation.
+func = eur_demog # our demographic model function
+func_ex = dadi.Numerics.make_extrap_log_func(func) #Generate a version of func that extrapolates to infinitely many gridpoints.
+params = [N1, T1, N2, T2, NC, TC] # our parameters
+lower_bound = [1e-2, 0.01, 1e-2, 1e-3, 1, 1e-3] # boundaries
 upper_bound = [10, 0.01, 10, 0.5, 200, 0.5]
 fixed_params = [None, 0.01, None, None, None, None]
 
@@ -257,15 +259,13 @@ popt = dadi.Inference.optimize_log(p0, syn_sfs, func_ex, pts_l,
 #best fit should be similar to
 #popt=[8.45886500e-02,1.00000000e-02,1.09948173e+00,7.04035448e-02,5.32986095e+01,2.00795456e-02]
 
-
 print("This is the demographic model")
 print(popt)
 
-#best fit should be similar to                                                                          
 ```
+To learn more about the optmization procedure please read [here](https://dadi.readthedocs.io/en/latest/user-guide/simulation-and-fitting/)
 
-
-Once we have found the optimum demographic parameters, we now can should compute the population scale diversity (theta_s). Because this method only fits the proportional SFS, theta_S is estimated with the dadi.Inference.optimal_sfs_scaling method. Then, we multiply theta_S by 2.31 to get theta_NS, i.e. theta_S∗2.31=theta_NS.        
+Once we have found the optimum demographic parameters, we now should be able to compute the population scale diversity (theta_s). Because this method only fits the proportional SFS, theta_S is estimated with the dadi.Inference.optimal_sfs_scaling method. Then, we multiply theta_S by 2.31 to get theta_NS, i.e. theta_S∗2.31=theta_NS.        
 
 ## Computing synonymous theta   
 ```{python, eval=F, python.reticulate=F}
@@ -296,7 +296,7 @@ def eur_demog_sel(params, ns, pts):
 	N1, T1, N2, T2, NC, TC, gamma = params
 	xx = dadi.Numerics.default_grid(pts)
 	phi = dadi.PhiManip.phi_1D(xx, gamma=gamma, h=0.5) # dominance coefficient (assuming that mutations are additive)
-	phi = dadi.Integration.one_pop(phi, xx, T1, N1, gamma=gamma) # assuming that nonsynonymous mutations are gamma distributed
+	phi = dadi.Integration.one_pop(phi, xx, T1, N1, gamma=gamma) # assuming that non-synonymous mutations are gamma distributed
 	phi = dadi.Integration.one_pop(phi, xx, T2, N2, gamma=gamma)
 	dadi.Integration.timescale_factor = 0.000001
 	nu_func = lambda t: N2*numpy.exp(numpy.log(NC/N2)*t/TC)
@@ -373,7 +373,10 @@ lower_bound=[1e-3, 1]
 upper_bound=[100,100000]
 params = (0.2, 1000)
 
+# Initiating with a random prior:
 p0 = dadi.Misc.perturb_params(params, upper_bound=upper_bound)
+
+# Optmizing your parameters given the data (nonsyn_sfs) 
 popt = Selection.optimize_log(p0, nonsyn_sfs, spectra.integrate, dfe,
 								 theta_ns, lower_bound=lower_bound, 
 								 upper_bound=upper_bound, verbose=len(p0),

@@ -436,6 +436,7 @@ plot_discrete_DFE <- function(alpha, beta, Nanc){
   return(plot1)
 }
 
+plot_discrete_DFE(0.252689, 1795.46, 9880.573)
 ```
 
 Try some of the values found within the Kim 2017 paper [here](https://www.genetics.org/content/206/1/345) to see if it agrees with their results. 

@@ -29,7 +29,7 @@ from dadi.Spectrum_mod import Spectrum
 
 class spectra:
     def __init__(self, params, ns, demo_sel_func, pts=500, pts_l=None, 
-                 Npts=500, n=20170., int_breaks=None, gamma_list=None,
+                 Npts=500, n=20170., int_breaks=None, 
                  int_bounds=(1e-4, 1000.), mp=False, echo=False, cpus=None):
         """
         params: optimized demographic parameters, don't include gamma 
@@ -51,7 +51,7 @@ class spectra:
         
         #create a vector of gammas that are log-spaced over sequential 
         #intervals or log-spaced over a single interval.
-        if (not (int_breaks is None)) and (gamma_list is None):
+        if not (int_breaks is None):
             numbreaks = len(int_breaks)
             stepint = Npts/(numbreaks-1)
             self.gammas = []
@@ -59,9 +59,7 @@ class spectra:
                 self.gammas = numpy.append(
                     self.gammas, -numpy.logspace(numpy.log10(int_breaks[i+1]), 
                                                  numpy.log10(int_breaks[i]), 
-                                                 int(stepint)))
-        elif not (gamma_list is None):
-            self.gammas = gamma_list
+                                                 stepint))
         else:
             self.gammas = -numpy.logspace(numpy.log10(int_bounds[1]), 
                                           numpy.log10(int_bounds[0]), Npts)
@@ -79,7 +77,7 @@ class spectra:
                 self.spectra.append(func_ex(tuple(params)+(gamma,), self.ns,
                                             self.pts_l))
                 if echo:
-                    print('{0}: {1}'.format(ii, gamma))
+                    print '{0}: {1}'.format(ii, gamma)
         else: #for running with with multiple cores
             import multiprocessing
             if cpus is None:
@@ -96,14 +94,14 @@ class spectra:
                         return
                     ii, gamma = item
                     sfs = popn_func_ex(tuple(params)+(gamma,), ns, pts_l)
-                    print('{0}: {1}'.format(ii, gamma))
+                    print '{0}: {1}'.format(ii, gamma)
                     result = (gamma, sfs)
                     outlist.append(result)
             manager = multiprocessing.Manager()
             results = manager.list()
             work = manager.Queue(cpus)
             pool = []
-            for i in range(cpus):
+            for i in xrange(cpus):
                 p = multiprocessing.Process(target=worker_sfs, 
                                             args=(work, results, func_ex,
                                             params, self.ns, self.pts_l))
@@ -111,7 +109,7 @@ class spectra:
                 pool.append(p)
             for ii,gamma in enumerate(self.gammas):
                 work.put((ii, gamma))
-            for jj in range(cpus):
+            for jj in xrange(cpus):
                 work.put(None)
             for p in pool:
                 p.join()
